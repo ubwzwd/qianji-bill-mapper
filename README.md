@@ -64,6 +64,8 @@ cp -r qianji-bill-mapper/skills/qianji-bill-mapper ~/.agents/skills/
 
 ChatGPT 已支持 Agent Skills 格式：在支持 Skills 的入口上传 `skills/qianji-bill-mapper/` 文件夹（含 `SKILL.md`、`scripts/`、`references/`、`assets/`）即可。
 
+**给完全不写代码、只用 app 聊天的人**：建议你把它做成一个 Custom GPT，发链接给对方，对方点开就能用、零安装。完整设置步骤和可直接粘贴的 GPT 说明见 [chatgpt-gpt-setup.md](chatgpt-gpt-setup.md)。
+
 ## 使用方式
 
 1. 按上面任一方式安装本技能。
