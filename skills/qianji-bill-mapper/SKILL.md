@@ -31,10 +31,12 @@ description: "把任意银行的账单（PDF 或图片格式）转换成钱迹�
 
 ### 第 1 步：读取账单
 
-按文件类型读取（参考 `/mnt/skills/public/file-reading/SKILL.md`）：
+按文件类型读取：
 
-- **PDF**：先 `pdftotext` 试抽文本。文本型 PDF 直接抽；扫描型/图片型 PDF 走 OCR（`pytesseract`）或把页面光栅化后用视觉读取。详见 `/mnt/skills/public/pdf-reading/SKILL.md`。
-- **图片**（jpg/png 等）：你已经能在上下文里看到它，直接视觉读取交易表格即可；必要时用 `pytesseract` OCR 辅助。
+- **PDF**：先用 `pdftotext`（poppler）试抽文本。文本型 PDF 直接抽；扫描型/图片型 PDF 走 OCR（`pytesseract` + `pdf2image`/`pdftoppm` 光栅化）或把页面转成图片后用视觉读取。
+- **图片**（jpg/png 等）：能直接在上下文里看到就直接视觉读取交易表格；否则用 `pytesseract` OCR 辅助。
+
+> 若你的运行环境自带文件读取/PDF 解析能力（例如 Claude.ai 的 `file-reading` / `pdf-reading` 技能），优先用它；没有时按上面的命令行工具处理。
 
 把每一笔交易的原始字段都抓出来：日期、（可能有的）时间、摘要/商户/备注、金额、借贷方向/正负号、（可能有的）余额。
 
@@ -108,8 +110,10 @@ description: "把任意银行的账单（PDF 或图片格式）转换成钱迹�
 不要手写 CSV 字符串（容易在编码、逗号转义、BOM 上出错）。把每一笔交易整理成一个 JSON 数组（键名用中文列名，缺的字段不写即可），存成 `transactions.json`，然后用本技能自带的脚本写出 CSV——它会强制 13 列、UTF-8 带 BOM、`\r\n` 行尾，并对**缺类型、负金额、转账/还款缺账户2、金额非数字**等问题打印提醒：
 
 ```bash
-python scripts/write_qianji_csv.py transactions.json /mnt/user-data/outputs/qianji_import.csv
+python scripts/write_qianji_csv.py transactions.json qianji_import.csv
 ```
+
+输出路径按运行环境定：本地（Claude Code / Codex / 普通终端）直接写到当前工作目录即可；Claude.ai/API 环境写到 `/mnt/user-data/outputs/` 这类可供下载的目录。脚本路径相对本技能目录，必要时用绝对路径。
 
 `transactions.json` 示例：
 
@@ -128,7 +132,7 @@ python scripts/write_qianji_csv.py transactions.json /mnt/user-data/outputs/qian
 
 ### 第 5 步：交给用户检查
 
-生成后，用 `present_files` 给出 CSV 文件，并附一段简短小结：
+生成后，把 CSV 文件交给用户（Claude.ai/API 用 `present_files`；Claude Code / Codex / 终端环境直接告诉用户文件路径或给出下载方式），并附一段简短小结：
 - 一共解析了多少笔交易、时间范围、合计支出/收入。
 - 第 3 步问过、已按用户意见归类的交易；以及最终仍留空分类的交易（如有），让用户知道可在钱迹里再补。
 - 如果有任何金额/日期/方向你不确定的交易，逐条点出来请用户核对，不要默默处理掉。

@@ -1,0 +1,11 @@
+{
+  "name": "qianji-bill-mapper",
+  "description": "把任意银行/信用卡账单（PDF 或图片）解析成钱迹（Qianji）App 可直接导入的标准模板 CSV。Converts any bank or credit-card statement (PDF or image) into a Qianji-ready import CSV.",
+  "version": "1.0.0",
+  "author": {
+    "name": "ubwzwd"
+  },
+  "homepage": "https://github.com/ubwzwd/qianji-bill-mapper",
+  "repository": "https://github.com/ubwzwd/qianji-bill-mapper",
+  "license": "MIT"
+}
